@@ -1,0 +1,6 @@
+app:
+  name: "simple-node-app"
+  node_version: "18"
+  build_command: "npm install"
+  start_command: "npm start"
+  port: 3000
