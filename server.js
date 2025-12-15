@@ -9,137 +9,307 @@ app.get('/', (req, res) => {
       <head>
         <title>🌤️ สภาพอากาศขอนแก่น</title>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <style>
-          body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+          * {
             margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 50%, #6c5ce7 100%);
-            color: white;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
-            background-attachment: fixed;
-          }
-          .container {
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 25px;
-            padding: 40px;
-            margin: auto;
-            max-width: 600px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-          }
-          h1 { 
-            font-size: 2.8em; 
-            margin-bottom: 30px; 
-            text-align: center;
-            background: linear-gradient(45deg, #fff, #a29bfe);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-          }
-          .weather-card {
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-          }
-          .loading {
-            text-align: center;
-            font-size: 1.2em;
-            color: #fdcb6e;
-          }
-          .weather-info {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-          }
-          .temp {
-            font-size: 3em;
-            font-weight: bold;
-            color: #fdcb6e;
-          }
-          .description {
-            font-size: 1.3em;
-            margin-bottom: 10px;
-            color: #ddd;
-          }
-          .details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-          }
-          .detail-item {
-            background: rgba(255,255,255,0.05);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-          }
-          .detail-label {
-            font-size: 0.9em;
-            opacity: 0.8;
-            margin-bottom: 5px;
-          }
-          .detail-value {
-            font-size: 1.2em;
-            font-weight: bold;
-          }
-          .error {
-            color: #ff7675;
-            text-align: center;
+            justify-content: center;
             padding: 20px;
+            color: #2c3e50;
+            line-height: 1.6;
           }
-          .refresh-btn {
-            background: linear-gradient(45deg, #00b894, #00a085);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            color: white;
-            cursor: pointer;
-            font-size: 1em;
-            margin: 20px auto;
+          
+          .app-container {
+            max-width: 400px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 
+              0 20px 40px rgba(0, 0, 0, 0.1),
+              0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+          }
+          
+          .app-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+          }
+          
+          .header {
+            text-align: center;
+            margin-bottom: 32px;
+          }
+          
+          .title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+          }
+          
+          .location {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 400;
+          }
+          
+          .weather-main {
+            text-align: center;
+            margin-bottom: 32px;
+            padding: 24px 0;
+          }
+          
+          .temperature {
+            font-size: 64px;
+            font-weight: 300;
+            color: #1e293b;
+            line-height: 1;
+            margin-bottom: 8px;
+            letter-spacing: -0.04em;
+          }
+          
+          .condition {
+            font-size: 16px;
+            color: #64748b;
+            font-weight: 400;
+            margin-bottom: 16px;
+          }
+          
+          .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #64748b;
+            font-size: 14px;
+          }
+          
+          .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e2e8f0;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          }
+          
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          
+          .weather-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+          }
+          
+          .detail-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+          }
+          
+          .detail-card:hover {
+            background: #f1f5f9;
+            transform: translateY(-2px);
+          }
+          
+          .detail-icon {
+            font-size: 20px;
+            margin-bottom: 8px;
             display: block;
-            transition: transform 0.2s;
           }
-          .refresh-btn:hover {
-            transform: scale(1.05);
+          
+          .detail-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
           }
+          
+          .detail-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+          }
+          
+          .refresh-button {
+            width: 100%;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+          }
+          
+          .refresh-button:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+          }
+          
+          .refresh-button:active {
+            transform: translateY(0);
+          }
+          
           .footer {
             text-align: center;
-            margin-top: 30px;
-            opacity: 0.7;
-            font-size: 0.9em;
+            font-size: 12px;
+            color: #94a3b8;
+          }
+          
+          .error {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            font-size: 14px;
+            border: 1px solid #fecaca;
+          }
+          
+          /* Responsive design */
+          @media (max-width: 480px) {
+            .app-container {
+              padding: 24px;
+              margin: 16px;
+            }
+            
+            .temperature {
+              font-size: 56px;
+            }
+            
+            .weather-details {
+              gap: 12px;
+            }
+            
+            .detail-card {
+              padding: 16px;
+            }
+          }
+          
+          /* Dark mode support */
+          @media (prefers-color-scheme: dark) {
+            body {
+              background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            }
+            
+            .app-container {
+              background: rgba(30, 41, 59, 0.95);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .title {
+              color: #f1f5f9;
+            }
+            
+            .location, .condition {
+              color: #94a3b8;
+            }
+            
+            .temperature {
+              color: #f8fafc;
+            }
+            
+            .detail-card {
+              background: #334155;
+              border: 1px solid #475569;
+            }
+            
+            .detail-card:hover {
+              background: #3f4b5b;
+            }
+            
+            .detail-value {
+              color: #f1f5f9;
+            }
+            
+            .error {
+              background: rgba(220, 38, 38, 0.1);
+              border: 1px solid rgba(220, 38, 38, 0.3);
+            }
           }
         </style>
       </head>
       <body>
-        <div class="container">
-          <h1>🌤️ สภาพอากาศขอนแก่น</h1>
+        <div class="app-container">
+          <div class="header">
+            <h1 class="title">สภาพอากาศ</h1>
+            <p class="location">📍 ขอนแก่น, ประเทศไทย</p>
+          </div>
           
-          <div class="weather-card">
-            <div id="weather-content" class="loading">
-              <div>⏳ กำลังโหลดข้อมูลสภาพอากาศ...</div>
+          <div class="weather-main">
+            <div id="weather-content">
+              <div class="loading">
+                <div class="loading-spinner"></div>
+                <span>กำลังโหลด...</span>
+              </div>
             </div>
           </div>
           
-          <button class="refresh-btn" onclick="loadWeather()">🔄 อัพเดทข้อมูล</button>
+          <div id="weather-details" class="weather-details" style="display: none;">
+            <!-- Weather details will be populated here -->
+          </div>
+          
+          <button class="refresh-button" onclick="loadWeather()">
+            <span>🔄</span>
+            <span>อัปเดต</span>
+          </button>
           
           <div class="footer">
-            <p>📍 จังหวัดขอนแก่น, ประเทศไทย</p>
-            <p>🕐 อัพเดทล่าสุด: <span id="last-update">${new Date().toLocaleString('th-TH')}</span></p>
+            <p>อัปเดตล่าสุด: <span id="last-update">${new Date().toLocaleString('th-TH')}</span></p>
           </div>
         </div>
 
         <script>
           async function loadWeather() {
             const content = document.getElementById('weather-content');
+            const details = document.getElementById('weather-details');
             const updateTime = document.getElementById('last-update');
             
-            content.innerHTML = '<div class="loading">⏳ กำลังโหลดข้อมูลสภาพอากาศ...</div>';
+            content.innerHTML = \`
+              <div class="loading">
+                <div class="loading-spinner"></div>
+                <span>กำลังโหลด...</span>
+              </div>
+            \`;
+            details.style.display = 'none';
             
             try {
               const response = await fetch('/api/weather');
@@ -150,42 +320,53 @@ app.get('/', (req, res) => {
                 return;
               }
               
+              // Main weather display
               content.innerHTML = \`
-                <div class="weather-info">
-                  <div>
-                    <div class="temp">\${data.temperature}°C</div>
-                    <div class="description">🌤️ \${data.description}</div>
-                  </div>
-                </div>
-                <div class="details">
-                  <div class="detail-item">
-                    <div class="detail-label">💧 ความชื้น</div>
-                    <div class="detail-value">\${data.humidity}%</div>
-                  </div>
-                  <div class="detail-item">
-                    <div class="detail-label">💨 ความเร็วลม</div>
-                    <div class="detail-value">\${data.windspeed} กม./ชม.</div>
-                  </div>
-                  <div class="detail-item">
-                    <div class="detail-label">📍 สถานที่</div>
-                    <div class="detail-value">\${data.location}</div>
-                  </div>
-                </div>
+                <div class="temperature">\${Math.round(data.temperature)}°</div>
+                <div class="condition">\${data.description}</div>
               \`;
               
-              updateTime.textContent = new Date().toLocaleString('th-TH');
+              // Weather details
+              details.innerHTML = \`
+                <div class="detail-card">
+                  <span class="detail-icon">💧</span>
+                  <div class="detail-label">ความชื้น</div>
+                  <div class="detail-value">\${data.humidity}%</div>
+                </div>
+                <div class="detail-card">
+                  <span class="detail-icon">💨</span>
+                  <div class="detail-label">ลม</div>
+                  <div class="detail-value">\${data.windspeed} กม/ชม</div>
+                </div>
+              \`;
+              details.style.display = 'grid';
+              
+              updateTime.textContent = new Date().toLocaleString('th-TH', {
+                timeStyle: 'short',
+                dateStyle: 'short'
+              });
               
             } catch (error) {
-              content.innerHTML = '<div class="error">❌ เกิดข้อผิดพลาดในการโหลดข้อมูล</div>';
+              content.innerHTML = \`
+                <div class="error">
+                  ❌ เกิดข้อผิดพลาดในการโหลดข้อมูล
+                </div>
+              \`;
               console.error('Error:', error);
             }
           }
           
-          // โหลดข้อมูลเมื่อหน้าเว็บโหลดเสร็จ
-          window.onload = loadWeather;
+          // Load weather data when page loads
+          window.addEventListener('load', loadWeather);
           
-          // รีเฟรชอัตโนมัติทุก 5 นาที
+          // Auto-refresh every 5 minutes
           setInterval(loadWeather, 300000);
+          
+          // Add some nice interactions
+          document.addEventListener('DOMContentLoaded', function() {
+            // Add smooth scroll behavior
+            document.documentElement.style.scrollBehavior = 'smooth';
+          });
         </script>
       </body>
     </html>
