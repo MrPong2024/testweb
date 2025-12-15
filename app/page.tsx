@@ -39,6 +39,27 @@ export default function WeatherApp() {
     return icons[description] || '🌤️'
   }
 
+  // Update favicon based on weather
+  const updateFavicon = (description: string) => {
+    const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement
+    if (favicon) {
+      // Create canvas to draw emoji as favicon
+      const canvas = document.createElement('canvas')
+      canvas.width = 32
+      canvas.height = 32
+      const ctx = canvas.getContext('2d')
+      
+      if (ctx) {
+        ctx.font = '24px serif'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText(getWeatherIcon(description), 16, 16)
+        
+        favicon.href = canvas.toDataURL()
+      }
+    }
+  }
+
   // Play refresh sound
   const playRefreshSound = () => {
     try {
@@ -90,7 +111,8 @@ export default function WeatherApp() {
       // Add delay for smooth animation
       setTimeout(() => {
         setWeatherData(data)
-        setLastUpdate(new Date().toLocaleString('th-TH', {
+        updateFavicon(data.description) // Update favicon
+        setLastUpdate(new Date().toLocaleString('en-US', {
           timeStyle: 'short',
           dateStyle: 'short'
         }))
@@ -192,40 +214,34 @@ export default function WeatherApp() {
   }, [])
 
   return (
-    <>
-      {/* Background particles */}
-      <div className="background-elements">
-        <div className="particle"></div>
-        <div className="particle"></div>
-        <div className="particle"></div>
-        <div className="particle"></div>
-        <div className="particle"></div>
-      </div>
-      
-      <div className="app-container">
-        <div className="header">
-          <h1 className="title">สภาพอากาศ</h1>
-          <p className="location">📍 ขอนแก่น, ประเทศไทย</p>
+    <div className="app-container">
+        <div className="header tech-header">
+          <h1 className="title holographic-title">
+            <span className="title-glow">Weather</span>
+          </h1>
+          <p className="location cyber-location">
+            📍 Khon Kaen, Thailand
+          </p>
         </div>
         
-        <div className="weather-main">
+        <div className="weather-main tech-display">
           {loading ? (
-            <div className="loading">
-              <div className="loading-spinner"></div>
-              <span>กำลังโหลด...</span>
+            <div className="loading holographic-loading">
+              <div className="loading-spinner cyber-spinner"></div>
+              <div className="loading-text">
+                <span className="scanning-text">Loading...</span>
+              </div>
             </div>
           ) : error ? (
-            <div className="error">❌ {error}</div>
+            <div className="error cyber-error">
+              <span className="error-icon">⚠️</span>
+              <span className="error-text">Error: {error}</span>
+            </div>
           ) : weatherData ? (
             <>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                marginBottom: '16px' 
-              }}>
+              <div className="weather-display holographic-container"> 
                 <span 
-                  className={`weather-icon ${
+                  className={`weather-icon tech-icon ${
                     weatherData.description.includes('ท้องฟ้าแจ่มใส') ? 'sunny' : 
                     weatherData.description.includes('ฝน') ? 'rainy' : ''
                   }`}
@@ -233,47 +249,67 @@ export default function WeatherApp() {
                   {getWeatherIcon(weatherData.description)}
                 </span>
                 <div 
-                  className="temperature" 
+                  className="temperature neon-display" 
                   onClick={() => handleTemperatureClick(weatherData.temperature)}
                 >
-                  {Math.round(weatherData.temperature)}°
+                  <span className="temp-number digital-font">{Math.round(weatherData.temperature)}</span>
+                  <span className="temp-unit digital-font">°C</span>
                 </div>
               </div>
-              <div className="condition">{weatherData.description}</div>
+              <div className="condition cyber-condition">
+                <span className="condition-text hologram-text">{weatherData.description}</span>
+              </div>
             </>
           ) : null}
         </div>
         
         {weatherData && !loading && (
-          <div className="weather-details">
-            <div className="detail-card" onClick={() => handleDetailClick('humidity')}>
-              <span className="detail-icon">💧</span>
-              <div className="detail-label">ความชื้น</div>
-              <div className="detail-value">{weatherData.humidity}%</div>
+          <div className="weather-details tech-grid">
+            <div className="detail-card tech-card" onClick={() => handleDetailClick('humidity')}>
+              <span className="detail-icon hologram-icon">💧</span>
+              <div className="detail-content">
+                <div className="detail-label matrix-text">Humidity</div>
+                <div className="detail-value neon-value">{weatherData.humidity}<span className="unit">%</span></div>
+              </div>
             </div>
-            <div className="detail-card" onClick={() => handleDetailClick('wind')}>
-              <span className="detail-icon">💨</span>
-              <div className="detail-label">ลม</div>
-              <div className="detail-value">{weatherData.windspeed} กม/ชม</div>
+            <div className="detail-card tech-card" onClick={() => handleDetailClick('wind')}>
+              <span className="detail-icon hologram-icon">💨</span>
+              <div className="detail-content">
+                <div className="detail-label matrix-text">Wind</div>
+                <div className="detail-value neon-value">{weatherData.windspeed}<span className="unit"> km/h</span></div>
+              </div>
             </div>
           </div>
         )}
         
         <button 
-          className={`refresh-button ${loading ? 'loading' : ''} ${
+          className={`refresh-button cyber-button ${
+            loading ? 'loading' : ''
+          } ${
             weatherData && !loading && !isRefreshing ? 'success' : ''
           }`}
           onClick={loadWeather}
           disabled={loading}
         >
-          <span className="refresh-icon">🔄</span>
-          <span>อัปเดต</span>
+          <span className="refresh-icon cyber-spin">🔄</span>
+          <span className="btn-text matrix-font">
+            {loading ? 'Loading...' : 'Update'}
+          </span>
         </button>
         
-        <div className="footer">
-          <p>อัปเดตล่าสุด: {lastUpdate || new Date().toLocaleString('th-TH')}</p>
+        <div className="footer cyber-footer">
+          <p className="update-time">
+            <span className="time-label">Last updated:</span>
+            <span className="time-value neon-text">{lastUpdate || new Date().toLocaleString('en-US', { 
+              timeStyle: 'short',
+              dateStyle: 'short'
+            })}</span>
+          </p>
+          <div className="system-status">
+            <span className="status-dot"></span>
+            <span className="status-text">Online</span>
+          </div>
         </div>
       </div>
-    </>
-  )
-}
+    )
+  }
